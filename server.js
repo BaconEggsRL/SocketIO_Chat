@@ -1,5 +1,15 @@
 /* index.js -- serverside express/socket.io code */
 
+console.log("START")
+
+var fs = require("fs");
+var text = fs.readFileSync("./words_alpha.txt", "utf-8");
+var words = text.split(/\r?\n/);
+
+console.log("DONE")
+
+//////////////////////////////////////////
+
 const express = require('express');
 const { createServer } = require('node:http');
 const { join } = require('node:path');
@@ -24,7 +34,7 @@ const maxHistory = 10;
 io.on('connection', (socket) => {
 
     // prompt for name and join
-    socket.emit('init', users);
+    socket.emit('init', users, words);
 
     /////////////////////////////////////////////////////
     // on client

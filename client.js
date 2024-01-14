@@ -1,16 +1,23 @@
 /* client.js -- clientside socket.io code */
 
+//////////////////////////////////////////
+
+// html
 const form = document.getElementById('form');
 const input = document.getElementById('input');
 const messages = document.getElementById('messages');
 const typing = document.getElementById('typing');
-const socket = io();
-const timeout_time = 2000;
-var timeout;
-var is_typing = false;
-let username;
 
-socket.on("init", async function(users) {
+// is_typing
+var typing_timeout;
+const typing_timeout_time = 2000;
+var is_typing = false;
+
+// init
+let username;
+let words;
+const socket = io();
+socket.on("init", async function(users, server_words) {
 
     console.log("init");
 
@@ -26,6 +33,17 @@ socket.on("init", async function(users) {
         usr = "No other users are currently online. \n\n"
     }
     console.log(usr)
+
+    // word list
+    words = new Set(server_words)
+    
+    console.log('word check below:')
+    //console.log(words)
+    console.log(words.has("a"))
+
+
+
+    ///////////////////////////////////////////////////////
     
     // loop prompt until we get a valid name
     let pmsg = "Please enter a unique username:\n(Usernames can be any valid string under 26 characters.)\n(Hit 'Cancel' to be assigned a random username.)\n"
@@ -121,8 +139,8 @@ input.addEventListener('keyup', function() {
                 typing: true,
             });
 
-            clearTimeout(timeout)
-            timeout = setTimeout(timeoutFunction, timeout_time)
+            clearTimeout(typing_timeout)
+            typing_timeout = setTimeout(timeoutFunction, typing_timeout_time)
         }
         
     }
@@ -132,6 +150,11 @@ input.addEventListener('keyup', function() {
 form.addEventListener('submit', (e) => {
     e.preventDefault();
     if (input.value) {
+
+        // check if valid word
+        //console.log(words)
+        console.log("'"+input.value+"' is valid?: " + words.has(input.value))
+
         addMessage(username + ": " + input.value);
         socket.emit("chat_message", {
             username: username,
